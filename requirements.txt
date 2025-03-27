@@ -7,3 +7,4 @@ beautifulsoup4
 sqlalchemy
 openai
 chromadb
+pymongo
