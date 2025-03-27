@@ -27,7 +27,15 @@ options.add_argument("--disable-dev-shm-usage")
 
 # --- Funzione per inizializzare il WebDriver ---
 def get_driver():
-    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    # Usa ChromeDriverManager per installare e gestire il driver
+    driver_path = ChromeDriverManager().install()  # Ottieni il percorso del chromedriver
+    service = Service(driver_path)
+    try:
+        driver = webdriver.Chrome(service=service, options=options)
+        return driver
+    except Exception as e:
+        print(f"Errore durante l'inizializzazione del WebDriver: {e}")
+        return None
 
 # --- Funzione per attendere elementi ---
 def wait_for_element(driver, xpath, timeout=10):
@@ -63,6 +71,10 @@ def get_speech_links(driver, page):
 # --- Estrai titolo e contenuto del discorso ---
 def extract_speech(url):
     driver = get_driver()
+    if driver is None:
+        print(f"Impossibile avviare il driver per l'URL: {url}")
+        return
+
     driver.get(url)
     time.sleep(2)
     
@@ -94,6 +106,10 @@ def extract_speech(url):
 # --- Avvio dello scraping concorrente ---
 if __name__ == "__main__":
     main_driver = get_driver()
+    if main_driver is None:
+        print("Impossibile avviare il driver principale!")
+        exit()
+
     total_pages = get_total_pages(main_driver)
     main_driver.quit()
 
@@ -102,8 +118,9 @@ if __name__ == "__main__":
     all_links = []
     for page in range(1, total_pages + 1):
         driver = get_driver()
-        all_links.extend(get_speech_links(driver, page))
-        driver.quit()
+        if driver is not None:
+            all_links.extend(get_speech_links(driver, page))
+            driver.quit()
 
     print(f"Totale discorsi trovati: {len(all_links)}")
 
