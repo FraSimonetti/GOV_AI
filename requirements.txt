@@ -1,0 +1,13 @@
+streamlit
+PyMuPDF
+pandas
+openai
+dotenv
+sentence-transformers
+openpyxl
+watchdog
+torch
+pdfplumber
+chardet
+scikit-learn
+pyvis
